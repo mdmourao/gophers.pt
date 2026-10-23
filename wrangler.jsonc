@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "gophers-portugal",
+  "name": "gophers-pt",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-21",
   "workers_dev": true,
