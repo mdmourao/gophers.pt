@@ -1,0 +1,25 @@
+# dependências
+node_modules/
+
+# build
+dist/
+.astro/
+
+# Cloudflare / Wrangler
+.wrangler/
+.cloudflare/
+.dev.vars*
+!.dev.vars.example
+
+# variáveis de ambiente
+.env*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+
+# sistema / editores
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,63 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  type?: 'website' | 'article';
+}
+
+const { title, description, type = 'website' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const meetupUrl = 'https://www.meetup.com/gophers-portugal/';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Gophers Portugal',
+  alternateName: ['Golang Portugal', 'Go Portugal', 'Comunidade Go Portugal'],
+  url: Astro.site?.toString(),
+  logo: new URL('/favicon.svg', Astro.site).toString(),
+  description: 'A comunidade de developers de Go (Golang) em Portugal.',
+  areaServed: { '@type': 'Country', name: 'Portugal' },
+  knowsAbout: ['Go', 'Golang', 'Programação', 'Desenvolvimento de software'],
+  sameAs: [meetupUrl, 'https://discord.gg/qKQe9HCrK4'],
+};
+---
+
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="keywords"
+      content="Go, Golang, Gophers, Portugal, comunidade Go, meetup Go, Golang Lisboa, Golang Porto, developers Portugal, programadores Portugal"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#00ADD8" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Blog Gophers Portugal" href="/blog/rss.xml" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Gophers Portugal" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="pt_PT" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

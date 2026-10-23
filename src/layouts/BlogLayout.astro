@@ -1,0 +1,102 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  type?: 'website' | 'article';
+}
+
+const { title, description, type } = Astro.props;
+---
+
+<Layout title={title} description={description} type={type}>
+  <slot name="head" slot="head" />
+  <header class="bar">
+    <div class="wrap bar-inner">
+      <a href="/" class="home">
+        <img src="/favicon.svg" alt="" width="24" height="24" />
+        Gophers Portugal
+      </a>
+      <nav>
+        <a href="/blog/">Blog</a>
+        <a href="https://www.meetup.com/gophers-portugal/" target="_blank" rel="noopener">Meetup</a>
+        <a href="https://discord.gg/qKQe9HCrK4" target="_blank" rel="noopener">Discord</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap main">
+    <slot />
+  </main>
+
+  <footer class="wrap foot">
+    <span>
+      © {new Date().getFullYear()} Gophers Portugal · Criado por
+        <a href="https://mdmourao.com/" target="_blank" rel="noopener">mdmourao</a>
+        (<a href="https://x.com/mdmourao" target="_blank" rel="noopener">@mdmourao</a>)
+    </span>
+    <a href="/blog/rss.xml">RSS</a>
+  </footer>
+</Layout>
+
+<style>
+  .wrap {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .bar {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .home {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  nav {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  .foot span a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  nav a:hover,
+  .foot a:hover {
+    color: var(--text);
+  }
+
+  .main {
+    padding-top: 3.5rem;
+    padding-bottom: 4rem;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    justify-content: space-between;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+</style>

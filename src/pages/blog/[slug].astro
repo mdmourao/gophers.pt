@@ -1,0 +1,144 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogLayout from '../../layouts/BlogLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const fmt = new Intl.DateTimeFormat('pt-PT', { dateStyle: 'long' });
+const url = new URL(Astro.url.pathname, Astro.site).toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  author: post.data.authors.map((author) =>
+    author.x
+      ? { '@type': 'Person', name: author.name, url: `https://x.com/${author.x}` }
+      : { '@type': 'Organization', name: author.name },
+  ),
+  publisher: { '@type': 'Organization', name: 'Gophers Portugal', url: Astro.site?.toString() },
+  mainEntityOfPage: url,
+  inLanguage: 'pt-PT',
+  keywords: ['Go', 'Golang', 'Portugal', ...post.data.tags].join(', '),
+};
+
+const creator = post.data.authors.find((author) => author.x)?.x;
+---
+
+<BlogLayout title={`${post.data.title} — Gophers Portugal`} description={post.data.description} type="article">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {creator && <meta name="twitter:creator" content={`@${creator}`} />}
+  </Fragment>
+
+  <article>
+    <a href="/blog/" class="back">← Blog</a>
+    <header>
+      <h1>{post.data.title}</h1>
+      <p class="meta">
+        <time datetime={post.data.date.toISOString()}>{fmt.format(post.data.date)}</time>
+        ·{' '}
+        {
+          post.data.authors.map((author, i) => (
+            <>
+              {i > 0 && ', '}
+              {author.name}
+              {author.x && (
+                <>
+                  {' '}(<a href={`https://x.com/${author.x}`} target="_blank" rel="noopener">@{author.x}</a>)
+                </>
+              )}
+            </>
+          ))
+        }
+      </p>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BlogLayout>
+
+<style>
+  .back {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .back:hover {
+    color: var(--text);
+  }
+
+  header {
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin: 0 0 0.75rem;
+  }
+
+  .meta {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .meta a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .meta a:hover {
+    color: var(--text);
+  }
+
+  .prose {
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+
+  .prose :global(h2) {
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+    margin: 2.5rem 0 0.75rem;
+  }
+
+  .prose :global(a) {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose :global(li) {
+    margin: 0.35rem 0;
+  }
+
+  .prose :global(:not(pre) > code) {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+  }
+
+  .prose :global(pre) {
+    font-size: 0.9rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+</style>
